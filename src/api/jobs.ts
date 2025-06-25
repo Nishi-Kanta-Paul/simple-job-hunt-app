@@ -6,7 +6,20 @@ const API_BASE_URL = 'http://localhost:3001';
 
 const api = axios.create({
   baseURL: API_BASE_URL,
+  timeout: 5000, // 5 second timeout
 });
+
+// Add response interceptor for better error handling
+api.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    console.error('API Error:', error);
+    if (error.code === 'ECONNREFUSED' || error.code === 'ERR_NETWORK') {
+      throw new Error('Backend server is not running. Please start json-server on port 3001.');
+    }
+    throw error;
+  }
+);
 
 export interface JobsResponse {
   data: Job[];

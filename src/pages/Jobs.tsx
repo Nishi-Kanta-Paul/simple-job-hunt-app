@@ -1,4 +1,3 @@
-
 import React, { useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import JobFilters from '../components/JobFilters';
@@ -9,9 +8,11 @@ import { useAppContext } from '../context/AppContext';
 const Jobs = () => {
   const { state, dispatch } = useAppContext();
 
-  const { data: jobsResponse, isLoading, error } = useQuery({
+  const { data: jobsResponse, isLoading, error, refetch } = useQuery({
     queryKey: ['jobs'],
     queryFn: () => fetchJobs(),
+    retry: 1, // Only retry once
+    retryDelay: 1000, // Wait 1 second before retry
   });
 
   useEffect(() => {
@@ -25,7 +26,12 @@ const Jobs = () => {
   }, [isLoading, dispatch]);
 
   useEffect(() => {
-    dispatch({ type: 'SET_ERROR', payload: error ? 'Failed to fetch jobs' : null });
+    if (error) {
+      const errorMessage = error instanceof Error ? error.message : 'Failed to fetch jobs';
+      dispatch({ type: 'SET_ERROR', payload: errorMessage });
+    } else {
+      dispatch({ type: 'SET_ERROR', payload: null });
+    }
   }, [error, dispatch]);
 
   if (isLoading) {
@@ -68,6 +74,8 @@ const Jobs = () => {
   }
 
   if (error) {
+    const isServerError = error instanceof Error && error.message.includes('Backend server is not running');
+    
     return (
       <div className="min-h-screen bg-gray-50 py-8">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -75,14 +83,29 @@ const Jobs = () => {
             <div className="w-24 h-24 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
               <span className="text-4xl">❌</span>
             </div>
-            <h3 className="text-lg font-semibold text-gray-900 mb-2">Something went wrong</h3>
-            <p className="text-gray-600 mb-4">We couldn't load the jobs. Please try again later.</p>
-            <button
-              onClick={() => window.location.reload()}
-              className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
-            >
-              Try Again
-            </button>
+            <h3 className="text-lg font-semibold text-gray-900 mb-2">
+              {isServerError ? 'Backend Server Not Running' : 'Something went wrong'}
+            </h3>
+            <p className="text-gray-600 mb-4 max-w-md mx-auto">
+              {isServerError 
+                ? 'Please start the JSON server by running: npx json-server --watch db.json --port 3001'
+                : 'We couldn\'t load the jobs. Please try again later.'
+              }
+            </p>
+            <div className="space-y-2">
+              <button
+                onClick={() => refetch()}
+                className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors mr-2"
+              >
+                Try Again
+              </button>
+              {isServerError && (
+                <div className="text-sm text-gray-500 mt-4">
+                  <p>Make sure you have json-server installed:</p>
+                  <code className="bg-gray-100 px-2 py-1 rounded text-xs">npm install -g json-server</code>
+                </div>
+              )}
+            </div>
           </div>
         </div>
       </div>
