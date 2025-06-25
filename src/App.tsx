@@ -10,6 +10,7 @@ import Home from "./pages/Home";
 import Jobs from "./pages/Jobs";
 import JobDetail from "./pages/JobDetail";
 import Apply from "./pages/Apply";
+import JobManagement from "./pages/JobManagement";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -27,6 +28,7 @@ const App = () => (
               <Route path="/" element={<Home />} />
               <Route path="/jobs" element={<Jobs />} />
               <Route path="/jobs/:id" element={<JobDetail />} />
+              <Route path="/manage" element={<JobManagement />} />
               <Route path="/apply" element={<Apply />} />
               <Route path="*" element={<NotFound />} />
             </Routes>

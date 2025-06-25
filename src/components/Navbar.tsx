@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Search, Heart, Home } from 'lucide-react';
+import { Search, Heart, Home, Settings } from 'lucide-react';
 import { useAppContext } from '../context/AppContext';
 
 const Navbar = () => {
@@ -48,6 +48,18 @@ const Navbar = () => {
             >
               <Search size={18} />
               <span className="font-medium">Jobs</span>
+            </Link>
+
+            <Link
+              to="/manage"
+              className={`flex items-center space-x-2 px-3 py-2 rounded-lg transition-colors ${
+                isActive('/manage')
+                  ? 'bg-blue-50 text-blue-600' 
+                  : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
+              }`}
+            >
+              <Settings size={18} />
+              <span className="font-medium">Manage</span>
             </Link>
 
             <Link
