@@ -9,16 +9,16 @@ import { useAppContext } from '../context/AppContext';
 const Jobs = () => {
   const { state, dispatch } = useAppContext();
 
-  const { data: jobs, isLoading, error } = useQuery({
+  const { data: jobsResponse, isLoading, error } = useQuery({
     queryKey: ['jobs'],
-    queryFn: fetchJobs,
+    queryFn: () => fetchJobs(),
   });
 
   useEffect(() => {
-    if (jobs) {
-      dispatch({ type: 'SET_JOBS', payload: jobs });
+    if (jobsResponse) {
+      dispatch({ type: 'SET_JOBS', payload: jobsResponse.data });
     }
-  }, [jobs, dispatch]);
+  }, [jobsResponse, dispatch]);
 
   useEffect(() => {
     dispatch({ type: 'SET_LOADING', payload: isLoading });
