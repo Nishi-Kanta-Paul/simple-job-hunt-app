@@ -1,20 +1,19 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { Search, Filter, X } from 'lucide-react';
-import { useAppContext } from '../context/AppContext';
 
-const JobFilters = () => {
-  const { state, dispatch } = useAppContext();
-  const { filters } = state;
-
-  const handleFilterChange = (key: keyof typeof filters, value: any) => {
-    dispatch({ type: 'SET_FILTER', payload: { key, value } });
+interface JobFiltersProps {
+  filters: {
+    search: string;
+    type: string;
+    category: string;
+    remote: boolean;
   };
+  onFilterChange: (key: string, value: any) => void;
+  onResetFilters: () => void;
+}
 
-  const resetFilters = () => {
-    dispatch({ type: 'RESET_FILTERS' });
-  };
-
+const JobFilters = ({ filters, onFilterChange, onResetFilters }: JobFiltersProps) => {
   const hasActiveFilters = Object.values(filters).some(value => 
     value !== '' && value !== false
   );
@@ -28,7 +27,7 @@ const JobFilters = () => {
         </div>
         {hasActiveFilters && (
           <button
-            onClick={resetFilters}
+            onClick={onResetFilters}
             className="flex items-center space-x-1 text-sm text-gray-600 hover:text-gray-900 transition-colors"
           >
             <X size={16} />
@@ -44,14 +43,14 @@ const JobFilters = () => {
             type="text"
             placeholder="Search jobs..."
             value={filters.search}
-            onChange={(e) => handleFilterChange('search', e.target.value)}
+            onChange={(e) => onFilterChange('search', e.target.value)}
             className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
           />
         </div>
 
         <select
           value={filters.type}
-          onChange={(e) => handleFilterChange('type', e.target.value)}
+          onChange={(e) => onFilterChange('type', e.target.value)}
           className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
         >
           <option value="">All Types</option>
@@ -63,7 +62,7 @@ const JobFilters = () => {
 
         <select
           value={filters.category}
-          onChange={(e) => handleFilterChange('category', e.target.value)}
+          onChange={(e) => onFilterChange('category', e.target.value)}
           className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
         >
           <option value="">All Categories</option>
@@ -77,7 +76,7 @@ const JobFilters = () => {
           <input
             type="checkbox"
             checked={filters.remote}
-            onChange={(e) => handleFilterChange('remote', e.target.checked)}
+            onChange={(e) => onFilterChange('remote', e.target.checked)}
             className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500"
           />
           <span className="text-sm text-gray-700">Remote only</span>

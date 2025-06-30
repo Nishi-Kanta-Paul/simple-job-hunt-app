@@ -1,17 +1,36 @@
-
-import React from 'react';
+import React, { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import JobFilters from '../components/JobFilters';
 import JobList from '../components/JobList';
 import { fetchJobs } from '../api/jobs';
 
 const Jobs = () => {
+  const [filters, setFilters] = useState({
+    search: '',
+    type: '',
+    category: '',
+    remote: false,
+  });
+
   const { data: jobsResponse, isLoading, error, refetch } = useQuery({
     queryKey: ['jobs'],
     queryFn: () => fetchJobs(),
     retry: 1,
     retryDelay: 1000,
   });
+
+  const handleFilterChange = (key: string, value: any) => {
+    setFilters(prev => ({ ...prev, [key]: value }));
+  };
+
+  const handleResetFilters = () => {
+    setFilters({
+      search: '',
+      type: '',
+      category: '',
+      remote: false,
+    });
+  };
 
   if (isLoading) {
     return (
@@ -105,8 +124,12 @@ const Jobs = () => {
           </p>
         </div>
 
-        <JobFilters />
-        <JobList />
+        <JobFilters 
+          filters={filters}
+          onFilterChange={handleFilterChange}
+          onResetFilters={handleResetFilters}
+        />
+        <JobList jobs={jobs} filters={filters} />
       </div>
     </div>
   );

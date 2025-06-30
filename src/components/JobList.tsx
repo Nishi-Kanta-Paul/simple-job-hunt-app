@@ -1,13 +1,19 @@
 
 import React, { useMemo } from 'react';
 import JobCard from './JobCard';
-import { useAppContext } from '../context/AppContext';
 import { Job } from '../context/AppContext';
 
-const JobList = () => {
-  const { state } = useAppContext();
-  const { jobs, filters } = state;
+interface JobListProps {
+  jobs: Job[];
+  filters: {
+    search: string;
+    type: string;
+    category: string;
+    remote: boolean;
+  };
+}
 
+const JobList = ({ jobs, filters }: JobListProps) => {
   const filteredJobs = useMemo(() => {
     return jobs.filter((job: Job) => {
       const matchesSearch = filters.search === '' || 
