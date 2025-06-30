@@ -1,38 +1,17 @@
-import React, { useEffect } from 'react';
+
+import React from 'react';
 import { useQuery } from '@tanstack/react-query';
 import JobFilters from '../components/JobFilters';
 import JobList from '../components/JobList';
 import { fetchJobs } from '../api/jobs';
-import { useAppContext } from '../context/AppContext';
 
 const Jobs = () => {
-  const { state, dispatch } = useAppContext();
-
   const { data: jobsResponse, isLoading, error, refetch } = useQuery({
     queryKey: ['jobs'],
     queryFn: () => fetchJobs(),
-    retry: 1, // Only retry once
-    retryDelay: 1000, // Wait 1 second before retry
+    retry: 1,
+    retryDelay: 1000,
   });
-
-  useEffect(() => {
-    if (jobsResponse) {
-      dispatch({ type: 'SET_JOBS', payload: jobsResponse.data });
-    }
-  }, [jobsResponse, dispatch]);
-
-  useEffect(() => {
-    dispatch({ type: 'SET_LOADING', payload: isLoading });
-  }, [isLoading, dispatch]);
-
-  useEffect(() => {
-    if (error) {
-      const errorMessage = error instanceof Error ? error.message : 'Failed to fetch jobs';
-      dispatch({ type: 'SET_ERROR', payload: errorMessage });
-    } else {
-      dispatch({ type: 'SET_ERROR', payload: null });
-    }
-  }, [error, dispatch]);
 
   if (isLoading) {
     return (
@@ -112,6 +91,8 @@ const Jobs = () => {
     );
   }
 
+  const jobs = jobsResponse?.data || [];
+
   return (
     <div className="min-h-screen bg-gray-50 py-8">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -120,7 +101,7 @@ const Jobs = () => {
             Job Opportunities
           </h1>
           <p className="text-gray-600">
-            Discover {state.jobs.length} amazing job opportunities waiting for you
+            Discover {jobs.length} amazing job opportunities waiting for you
           </p>
         </div>
 

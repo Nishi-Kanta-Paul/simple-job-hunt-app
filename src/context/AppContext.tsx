@@ -17,60 +17,24 @@ interface Job {
 }
 
 interface AppState {
-  jobs: Job[];
-  filters: {
-    search: string;
-    type: string;
-    category: string;
-    remote: boolean;
-  };
   favorites: string[];
-  isLoading: boolean;
-  error: string | null;
 }
 
 type AppAction =
-  | { type: 'SET_JOBS'; payload: Job[] }
-  | { type: 'SET_LOADING'; payload: boolean }
-  | { type: 'SET_ERROR'; payload: string | null }
-  | { type: 'SET_FILTER'; payload: { key: keyof AppState['filters']; value: any } }
-  | { type: 'TOGGLE_FAVORITE'; payload: string }
-  | { type: 'RESET_FILTERS' };
+  | { type: 'TOGGLE_FAVORITE'; payload: string };
 
 const initialState: AppState = {
-  jobs: [],
-  filters: {
-    search: '',
-    type: '',
-    category: '',
-    remote: false,
-  },
   favorites: JSON.parse(localStorage.getItem('job-favorites') || '[]'),
-  isLoading: false,
-  error: null,
 };
 
 const appReducer = (state: AppState, action: AppAction): AppState => {
   switch (action.type) {
-    case 'SET_JOBS':
-      return { ...state, jobs: action.payload };
-    case 'SET_LOADING':
-      return { ...state, isLoading: action.payload };
-    case 'SET_ERROR':
-      return { ...state, error: action.payload };
-    case 'SET_FILTER':
-      return {
-        ...state,
-        filters: { ...state.filters, [action.payload.key]: action.payload.value },
-      };
     case 'TOGGLE_FAVORITE':
       const newFavorites = state.favorites.includes(action.payload)
         ? state.favorites.filter(id => id !== action.payload)
         : [...state.favorites, action.payload];
       localStorage.setItem('job-favorites', JSON.stringify(newFavorites));
       return { ...state, favorites: newFavorites };
-    case 'RESET_FILTERS':
-      return { ...state, filters: initialState.filters };
     default:
       return state;
   }
